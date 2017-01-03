@@ -358,11 +358,16 @@
             global $pdo;
 
             $sql = "select * from product where id = :product_id";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute(array(
+            $pr = array(
                 ":product_id" => $param["product_id"],
-            ));
-            $product = $stmt->fetch();
+            );
+            $product = DB::QueryRow($sql, $pr);
+
+            $sql = "select * from product_pic where product_id = :product_id and status = 'Y'";
+            $pr = array(
+                ":product_id" => $param["product_id"]
+            );
+            $product['pic'] = DB::QueryAll($sql, $pr);
             responseJson(array(
                 'status' => true,
                 'data' => $product
@@ -385,35 +390,53 @@
             if($param['id'] == "create"){
                 $product_code = _getNextCode("product", "code", "P", 5, 1);
 
-                $sql = "INSERT INTO product (code, product_name, product_description, status, product_price, product_qty, created_by, updated_by, uuid ) "
-                     . "VALUES(:code, :product_name, :product_description, 'true', :product_price, :product_qty, :staff_id, :staff_id, uuid())";
-
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute(array(
+                $sql = "INSERT INTO product (code, product_name, product_description, status, product_price, product_qty, created_by, updated_by, uuid, category_id ) "
+                     . "VALUES(:code, :product_name, :product_description, 'true', :product_price, :product_qty, :staff_id, :staff_id, uuid(), :category_id)";
+                $pr = (array(
                     ':code' => $product_code,
                     ':product_name' => $param['name'],
                     ':product_description' => $param['desc'],
                     ':product_price' => $param['price'],
                     ':product_qty' => $param['qty'],
-                    ':staff_id' => $param['staffid']
+                    ':staff_id' => $param['staffid'],
+                    ':category_id' => $param['category']
                 ));
 
-                $prod_id = $pdo->lastInsertId();
+                $res = DB::Insert($sql, $pr);
+
+                $prod_id = $res['insertId'];
+
+                if($param['pic_id']){
+                    $sqls = "UPDATE product_pic SET product_id = '$prod_id' WHERE id IN (" . implode(",",$param['pic_id']) . ")";
+                    DB::Update($sqls);
+                }
+                
             }else{
                 $sql = "UPDATE product SET product_name = :product_name, product_description = :product_description, status = :status, 
-                        product_price = :product_price, product_qty = :product_qty, updated_by = :staff_id 
+                        product_price = :product_price, product_qty = :product_qty, updated_by = :staff_id, category_id = :category_id 
                         WHERE id = :id";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute(array(
+                $pr = array(
                     ':id' => $param['id'],
                     ':product_name' => $param['name'],
                     ':product_description' => $param['desc'],
                     ':status' => "true",
                     ':product_price' => $param['price'],
                     ':product_qty' => $param['qty'],
-                    ':staff_id' => $param['staffid']
-                ));
+                    ':staff_id' => $param['staffid'],
+                    ':category_id' => $param['category']
+                );
 
+                DB::Update($sql, $pr);
+
+                if($param['pic_id']){
+                    $sql = "UPDATE product_pic SET status = 'N' WHERE product_id = '$param[id]'";
+                    DB::Update($sql);
+
+                    $sqls = "UPDATE product_pic SET product_id = '$param[id]', status = 'Y' WHERE id IN (" . implode(",",$param['pic_id']) . ")";
+
+                    DB::Update($sqls);
+                }
+                
                 $prod_id = $param['id'];
             }
 

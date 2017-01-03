@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"prou",
+				"product"
+			],
+			[
+				"prod",
+				"product_id"
+			],
+			[
 				"arr",
 				"array\t$… = array (…)"
 			],
@@ -64,10 +72,6 @@
 				"else"
 			],
 			[
-				"prod",
-				"product_code"
-			],
-			[
 				"upda",
 				"updated_by"
 			],
@@ -95,7 +99,7 @@
 			"file": "api.php",
 			"settings":
 			{
-				"buffer_size": 14294,
+				"buffer_size": 14943,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -104,7 +108,7 @@
 			"file": "upload.php",
 			"settings":
 			{
-				"buffer_size": 2413,
+				"buffer_size": 2749,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -157,7 +161,8 @@
 	},
 	"expanded_folders":
 	[
-		"/C/xampp/htdocs/project_shop_api"
+		"/C/xampp/htdocs/project_shop_api",
+		"/C/xampp/htdocs/project_shop_api/product-img"
 	],
 	"file_history":
 	[
@@ -170,7 +175,7 @@
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 34.0
 	},
 	"find_in_files":
 	{
@@ -204,7 +209,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -213,15 +218,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 14294,
+						"buffer_size": 14943,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8385,
-								8385
+								13928,
+								13928
 							]
 						],
 						"settings":
@@ -231,10 +236,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3770.0,
+						"translation.y": 6350.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -243,15 +248,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2413,
+						"buffer_size": 2749,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								766,
-								740
+								2326,
+								2326
 							]
 						],
 						"settings":
@@ -261,7 +266,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 720.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
@@ -280,8 +285,8 @@
 						"selection":
 						[
 							[
-								714,
-								714
+								1159,
+								1165
 							]
 						],
 						"settings":
@@ -290,10 +295,10 @@
 							"syntax": "Packages/PHP/PHP.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 315.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -418,11 +423,6 @@
 				{
 					"group": 0,
 					"index": 2
-				},
-				"20":
-				{
-					"group": 0,
-					"index": 3
 				}
 			},
 			"restore_layout":
@@ -467,7 +467,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 150.0,
+	"side_bar_width": 257.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

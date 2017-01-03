@@ -41,26 +41,36 @@
 
     ///////////////////////////////////// Funtion //////////////////////////////////////////
 
-    function saveProductPic($file, $content, $name, $type, $size){
+    function saveProductPic(){
         try {
-            global $pdo;
+            global $pdo, $file, $content, $name, $type, $size;
+
+            $new_name = date("Ymdhisa");
+
+            $taget = "./product-img/" . $new_name . "_" . $name;
+            move_uploaded_file($file, $taget);
 
             $pdo->beginTransaction();
-            $sql = "INSERT INTO product_pic(productpic_name, productpic_type, productpic_size, productpic_content, uuid) 
-                    VALUES(:productpic_name, :productpic_type, :productpic_size, :productpic_content, uuid())";
+            $sql = "INSERT INTO product_pic(productpic_name, productpic_type, productpic_size, productpic_path, uuid) 
+                    VALUES(:productpic_name, :productpic_type, :productpic_size, :productpic_path, uuid())";
             $stmt = $pdo->prepare($sql);
             $stmt->execute(array(
                 ':productpic_name' => $name,
                 ':productpic_type' => $type,
                 ':productpic_size' => $size,
-                ':productpic_content' => $content
+                ':productpic_path' => substr($taget, 2)
             ));
             $pic_id = $pdo->lastInsertId();
+
+            $getImg = "SELECT * FROM product_pic WHERE id = '$pic_id'";
+            $stmt = $pdo->prepare($getImg);
+            $stmt->execute();
+            $pic = $stmt->fetch();
 
             $pdo->commit();
             responseJson(array(
                 'status' => true,
-                'data' => $pic_id
+                'data' => $pic
             ));
         } catch (PDOException $e) {
             $pdo->rollback();
