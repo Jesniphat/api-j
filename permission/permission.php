@@ -10,7 +10,7 @@
         public function readToken(){
             $token;
             $cookieUser = $_COOKIE[$this->cookieName];
-            // $cookieUser = false;
+
             if ($cookieUser) {
                 $jwt = JWT::decode($_COOKIE[$this->cookieName], $this->lock, array('HS256'));
                 $token = (array) $jwt;

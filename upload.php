@@ -21,7 +21,6 @@
     include_once 'config.php';
 
 	if($_FILES){
-        // print_r($_FILES);
 		$file = $_FILES['file']['tmp_name'];
 		// $content = addslashes(file_get_contents($file));
 		$name = $_FILES['file']['name'];
