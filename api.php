@@ -247,7 +247,7 @@
         try{
             global $pdo;
 
-            $sql = "SELECT * FROM category";
+            $sql = "SELECT id, cate_name, cate_description, '' as product_qty FROM category";
             
             $category_list = DB::QueryAll($sql);
 
