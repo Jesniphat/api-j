@@ -51,6 +51,9 @@
 
     if($isCheckLogin){
         switch ($req[1]) {
+            case 'ping':
+                ping($param);
+                break;
             case 'session':
                 doSetSession($param);
                 break;
@@ -104,6 +107,13 @@
     //////////////////////////////////////////////////////////
     // START
     //////////////////////////////////////////////////////////
+
+    function ping($param){
+        responseJson(array(
+            'status' => true,
+            'data' => "1"
+        ));
+    }
 
     function test($param){
         try {
@@ -185,8 +195,9 @@
                 'status' => true,
                 'data' => array(
                     "id"=>$staffID['id'], 
-                    "display_name"=>$staffID['user'], 
-                    "login_name" => $staffID['name'], 
+                    "display_name"=>$staffID['name'], 
+                    "last_name" => $staffID['lastname'],
+                    "login_name" => $staffID['user'], 
                     "password" => $staffID['password']
                 )
             ));
@@ -229,10 +240,24 @@
 
     function updatestaff($param){
         try{
-            // update to mysql
+            global $pdo;
+            $pdo->beginTransaction();
+
+            $sql = "UPDATE staff SET name = :name, lastname = :lastname, user = :user WHERE id = :id";
+            $pr = array(
+                    ':name' => $param['name'],
+                    ':lastname' => $param['lastName'],
+                    ':user' => $param['user'],
+                    ':id' => $param['id']
+                );
+            $res = DB::Update($sql, $pr);
+            $staff_id = $param['id'];
+
+            $pdo->commit();
+
             responseJson(array(
                 'status' => true,
-                'data' => array("id"=>"2", "display_name"=>$param['name'], "login_name" => $param['user'], "password" => "jesses")
+                'data' => array("id"=>$param['id'], "display_name"=>$param['name'], "login_name" => $param['user'], "password" => $param['password'], "last_name" => $param['lastName'])
             ));
         }catch (PDOException $e){
             responseJson(array(
