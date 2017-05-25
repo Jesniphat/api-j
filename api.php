@@ -360,7 +360,7 @@
         try{
             global $pdo;
 
-            $sql = "SELECT * FROM product ";
+            $sql = "select p.*,max(pp.productpic_path) as img from product p inner join product_pic pp on p.id = pp.product_id group by p.id ";
             $stmt = $pdo->prepare($sql);
             $stmt->execute();
             $product_list = $stmt->fetchAll();
