@@ -57,7 +57,7 @@
     	try{
             global $pdo;
 
-            $sql = "SELECT p.*, MAX(pp.productpic_name) as product_pic, MAX(pp.productpic_path) as product_path FROM product p left join product_pic pp on p.id = pp.product_id group by p.id limit 3";
+            $sql = "SELECT * FROM slider";
             
             $three_product = DB::QueryAll($sql);
 

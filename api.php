@@ -33,8 +33,8 @@
     //  inclued setting
     ///////////////////////////////////////////////////////////
     include_once 'config.php';
-    include_once './jwt/JWT.php';
-    include_once './permission/permission.php';
+    include_once 'jwt/JWT.php';
+    include_once 'permission/permission.php';
     include_once 'base.php';
 
     ///////////////////////////////////////////////////////////
@@ -95,6 +95,21 @@
                 break;
             case 'saveproduct':
                 saveproduct($param);
+                break;
+            case 'saveslider':
+                saveslider($param);
+                break;
+            case 'getsliderbyid':
+                getsliderbyid($param);
+                break;
+            case 'slider_list':
+                getallslider($param);
+                break;
+            case 'delete_product':
+                delete_product($param);
+                break;
+            case 'delete_slider':
+                delete_slider($param);
                 break;
         }
     }else{
@@ -360,7 +375,7 @@
         try{
             global $pdo;
 
-            $sql = "select p.*,max(pp.productpic_path) as img from product p inner join product_pic pp on p.id = pp.product_id group by p.id ";
+            $sql = "select p.*,max(pp.productpic_path) as img from product p inner join product_pic pp on p.id = pp.product_id where p.status = 'Y' group by p.id ";
             $stmt = $pdo->prepare($sql);
             $stmt->execute();
             $product_list = $stmt->fetchAll();
@@ -478,6 +493,154 @@
             ));
         }
     }
+
+    function saveslider($param){
+        try{
+            global $pdo;
+            $pdo->beginTransaction();
+
+            if($param['id'] == "create"){
+                // $product_code = _getNextCode("product", "code", "P", 5, 1);
+
+                $sql = "INSERT INTO slider (name, description, link_to, link_id, pic_name, pic_path, created_by, updated_by) "
+                     . "VALUES(:name, :description, :link_to, :link_id, :pic_name, :pic_path, :created_by, :updated_by)";
+                $pr = (array(
+                    ':name' => $param['name'],
+                    ':description' => $param['description'],
+                    ':link_to' => $param['link_to'],
+                    ':link_id' => $param['link_id'],
+                    ':pic_name' => $param['image_data']['pic_name'],
+                    ':pic_path' => $param['image_data']['pic_path'],
+                    ':created_by' => $param['staff'],
+                    ':updated_by' => $param['staff']
+                ));
+
+                $res = DB::Insert($sql, $pr);
+
+                $prod_id = $res['insertId'];
+
+                if($param['pic_id']){
+                    $sqls = "UPDATE product_pic SET product_id = '$prod_id' WHERE id IN (" . implode(",",$param['pic_id']) . ")";
+                    DB::Update($sqls);
+                }
+                
+            }else{
+                $sql = "UPDATE slider SET name = :name, description = :description, link_to = :link_to, link_id = :link_id, pic_name = :pic_name, pic_path = :pic_path, updated_by = :updated_by WHERE id = :id ";
+                $pr = (array(
+                    ':id' => $param['id'],
+                    ':name' => $param['name'],
+                    ':description' => $param['description'],
+                    ':link_to' => $param['link_to'],
+                    ':link_id' => $param['link_id'],
+                    ':pic_name' => $param['image_data']['pic_name'],
+                    ':pic_path' => $param['image_data']['pic_path'],
+                    ':updated_by' => $param['staff']
+                ));
+
+                DB::Update($sql, $pr);
+            }
+
+            $pdo->commit();
+            responseJson(array(
+                'status' => true,
+                'data' => $prod_id
+            ));
+        }catch(PDOException $e){
+            $pdo->rollback();
+            responseJson(array(
+                'status' => false,
+                'error' => $e -> getMessage()
+            ));
+        }
+    }
+
+    function getsliderbyid($param){
+        try{
+            global $pdo;
+
+            $sql = "select * from slider where id = :slider_id";
+            $pr = array(
+                ":slider_id" => $param["id"],
+            );
+            $slider = DB::QueryRow($sql, $pr);
+
+            responseJson(array(
+                'status' => true,
+                'data' => $slider
+            ));
+        }catch(PDOException $e){
+            responseJson(array(
+                'status' => false,
+                'error' => $e -> getMessage()
+            ));
+        }
+    }
+
+    function getallslider($param){
+        try{
+            global $pdo;
+
+            $sql = "select * from slider where status = 'Y'";
+            // $pr = array();
+            $slider = DB::QueryAll($sql);
+
+            responseJson(array(
+                'status' => true,
+                'data' => $slider
+            ));
+        }catch(PDOException $e){
+            responseJson(array(
+                'status' => false,
+                'error' => $e -> getMessage()
+            ));
+        }
+    }
+
+    function delete_product($param){
+        try{
+            global $pdo;
+
+            $sql = "UPDATE product SET status = 'N' WHERE id = :id";
+            $pr = array(
+                ":id" => $param["id"],
+            );
+            $row = DB::Update($sql, $pr);
+
+            responseJson(array(
+                'status' => true,
+                'data' => $row
+            ));
+        }catch(PDOException $e){
+            responseJson(array(
+                'status' => false,
+                'error' => $e -> getMessage()
+            ));
+        }  
+    }
+
+
+    function delete_slider($param){
+        try{
+            global $pdo;
+
+            $sql = "UPDATE slider SET status = 'N' WHERE id = :id";
+            $pr = array(
+                ":id" => $param["id"],
+            );
+            $row = DB::Update($sql, $pr);
+
+            responseJson(array(
+                'status' => true,
+                'data' => $row
+            ));
+        }catch(PDOException $e){
+            responseJson(array(
+                'status' => false,
+                'error' => $e -> getMessage()
+            ));
+        }   
+    }
+
 
     function _getNextCode($table, $fld, $prefix='', $size=5, $start=1) {
             global $pdo;
