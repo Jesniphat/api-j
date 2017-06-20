@@ -57,7 +57,7 @@
     	try{
             global $pdo;
 
-            $sql = "SELECT * FROM slider";
+            $sql = "SELECT * FROM slider WHERE status = 'Y'";
             
             $three_product = DB::QueryAll($sql);
 
