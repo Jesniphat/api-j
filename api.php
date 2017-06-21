@@ -375,7 +375,7 @@
         try{
             global $pdo;
 
-            $sql = "select p.*,max(pp.productpic_path) as img from product p inner join product_pic pp on p.id = pp.product_id where p.status = 'Y' group by p.id ";
+            $sql = "select p.*,max(pp.productpic_path) as img from product p inner join product_pic pp on p.id = pp.product_id where p.status = 'Y' and pp.cover = 'Y' group by p.id ";
             $stmt = $pdo->prepare($sql);
             $stmt->execute();
             $product_list = $stmt->fetchAll();
@@ -431,7 +431,7 @@
                 $product_code = _getNextCode("product", "code", "P", 5, 1);
 
                 $sql = "INSERT INTO product (code, product_name, product_description, status, product_price, product_qty, created_by, updated_by, uuid, category_id ) "
-                     . "VALUES(:code, :product_name, :product_description, 'true', :product_price, :product_qty, :staff_id, :staff_id, uuid(), :category_id)";
+                     . "VALUES(:code, :product_name, :product_description, 'Y', :product_price, :product_qty, :staff_id, :staff_id, uuid(), :category_id)";
                 $pr = (array(
                     ':code' => $product_code,
                     ':product_name' => $param['name'],
@@ -450,6 +450,36 @@
                     $sqls = "UPDATE product_pic SET product_id = '$prod_id' WHERE id IN (" . implode(",",$param['pic_id']) . ")";
                     DB::Update($sqls);
                 }
+
+                if($param['recommend']==true){
+                    $sql = "SELECT id FROM product WHERE recommend = 'Y' ORDER BY rec_row";
+                    $rec = DB::QueryAll($sql);
+                    $recommend_list = array();
+                    foreach($rec as $key => $val){
+                        if($key == 0 && count($rec)==3){
+                            continue;
+                        }
+                        array_push($recommend_list, $val['id']);
+                    }
+                    array_push($recommend_list, $prod_id);
+
+                    $sql = "UPDATE product SET recommend = 'N' WHERE recommend = 'Y'";
+                    DB::Update($sql);
+
+                    foreach($recommend_list as $key => $rec_id){
+                        $sql = "UPDATE product SET recommend = 'Y', rec_row = $key WHERE id = $rec_id";
+                        DB::Update($sql);
+                    }
+                    // echo $sql;
+                }
+
+                if($param['coverId']){
+                    $sql = "UPDATE product_pic SET cover = 'Y' WHERE id = :cover_id";
+                    $pr = (array(
+                        ':cover_id' => $param['coverId']
+                    ));
+                    DB::Update($sql,$pr);
+                }
                 
             }else{
                 $sql = "UPDATE product SET product_name = :product_name, product_description = :product_description, status = :status, 
@@ -459,7 +489,7 @@
                     ':id' => $param['id'],
                     ':product_name' => $param['name'],
                     ':product_description' => $param['desc'],
-                    ':status' => "true",
+                    ':status' => "Y",
                     ':product_price' => $param['price'],
                     ':product_qty' => $param['qty'],
                     ':staff_id' => $param['staffid'],
@@ -473,8 +503,44 @@
                     DB::Update($sql);
 
                     $sqls = "UPDATE product_pic SET product_id = '$param[id]', status = 'Y' WHERE id IN (" . implode(",",$param['pic_id']) . ")";
-
                     DB::Update($sqls);
+
+                }
+
+                if($param['recommend']==true){
+                    $sql = "SELECT id FROM product WHERE recommend = 'Y' ORDER BY rec_row";
+                    $rec = DB::QueryAll($sql);
+                    $recommend_list = array();
+                    foreach($rec as $key => $val){
+                        if($key == 0 && count($rec)==3){
+                            continue;
+                        }
+                        array_push($recommend_list, $val['id']);
+                    }
+                    array_push($recommend_list, $param['id']);
+
+                    $sql = "UPDATE product SET recommend = 'N' WHERE recommend = 'Y'";
+                    DB::Update($sql);
+
+                    foreach($recommend_list as $key => $rec_id){
+                        $sql = "UPDATE product SET recommend = 'Y', rec_row = $key WHERE id = $rec_id";
+                        DB::Update($sql);
+                    }
+                } else {
+                    $sql = "UPDATE product SET recommend = 'N', rec_row = '0' WHERE id = $param[id]";
+                    DB::Update($sql);
+                }
+
+                if($param['coverId']){
+                    $sql = "UPDATE product_pic SET cover = 'N' WHERE product_id = '$param[id]'";
+                    DB::Update($sql); 
+
+                    $sql = "UPDATE product_pic SET cover = 'Y' WHERE id = :cover_id";
+                    $pr = (array(
+                        ':cover_id' => $param['coverId']
+                    ));
+                    DB::Update($sql,$pr);
+                    // echo $param['coverId'];
                 }
                 
                 $prod_id = $param['id'];

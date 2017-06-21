@@ -47,6 +47,9 @@
 	    case 'getTheerProduct':
 	    	getTheerProduct($param);
 	    	break;
+        case 'getRecommendProduct':
+            getRecommendProduct($param);
+            break;
 	}
 
 	//////////////////////////////////////////////////////////
@@ -64,6 +67,26 @@
             responseJson(array(
                 'status' => true,
                 'data' => $three_product
+            ));
+        }catch(PDOException $e){
+            responseJson(array(
+                'status' => false,
+                'error' => $e -> getMessage()
+            ));
+        }
+    }
+
+    function getRecommendProduct($param){
+        try{
+            global $pdo;
+
+            $sql = "SELECT p.*,max(pp.productpic_path) AS img FROM product p INNER JOIN product_pic pp ON p.id = pp.product_id WHERE p.status = 'Y' AND pp.cover = 'Y' AND p.recommend = 'Y' group by p.id ";;
+            
+            $recommend = DB::QueryAll($sql);
+
+            responseJson(array(
+                'status' => true,
+                'data' => $recommend
             ));
         }catch(PDOException $e){
             responseJson(array(
