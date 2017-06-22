@@ -375,7 +375,7 @@
         try{
             global $pdo;
 
-            $sql = "select p.*,max(pp.productpic_path) as img from product p inner join product_pic pp on p.id = pp.product_id where p.status = 'Y' and pp.cover = 'Y' group by p.id ";
+            $sql = "select p.*,max(pp.productpic_path) as img from product p left join product_pic pp on p.id = pp.product_id and pp.cover = 'Y' where p.status = 'Y' group by p.id ";
             $stmt = $pdo->prepare($sql);
             $stmt->execute();
             $product_list = $stmt->fetchAll();
@@ -473,7 +473,7 @@
                     // echo $sql;
                 }
 
-                if($param['coverId']){
+                if($param['coverId'] != '0'){
                     $sql = "UPDATE product_pic SET cover = 'Y' WHERE id = :cover_id";
                     $pr = (array(
                         ':cover_id' => $param['coverId']
@@ -505,14 +505,19 @@
                     $sqls = "UPDATE product_pic SET product_id = '$param[id]', status = 'Y' WHERE id IN (" . implode(",",$param['pic_id']) . ")";
                     DB::Update($sqls);
 
+                }else{
+                    $sql = "UPDATE product_pic SET status = 'N', cover = 'N' WHERE product_id = '$param[id]'";
+                    DB::Update($sql);
                 }
 
                 if($param['recommend']==true){
                     $sql = "SELECT id FROM product WHERE recommend = 'Y' ORDER BY rec_row";
                     $rec = DB::QueryAll($sql);
+                    $recs = array();
                     $recommend_list = array();
+                    foreach ($rec as $idcheck) { array_push($recs, $idcheck['id']); }
                     foreach($rec as $key => $val){
-                        if($key == 0 && count($rec)==3){
+                        if($key == 0 && count($rec)==3 && !in_array($param['id'], $recs)){
                             continue;
                         }
                         array_push($recommend_list, $val['id']);
@@ -531,7 +536,7 @@
                     DB::Update($sql);
                 }
 
-                if($param['coverId']){
+                if($param['coverId'] != '0'){
                     $sql = "UPDATE product_pic SET cover = 'N' WHERE product_id = '$param[id]'";
                     DB::Update($sql); 
 

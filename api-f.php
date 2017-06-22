@@ -50,6 +50,9 @@
         case 'getRecommendProduct':
             getRecommendProduct($param);
             break;
+        case 'getNewProduct':
+            gerNewProduct($param);
+            break;
 	}
 
 	//////////////////////////////////////////////////////////
@@ -89,6 +92,26 @@
                 'data' => $recommend
             ));
         }catch(PDOException $e){
+            responseJson(array(
+                'status' => false,
+                'error' => $e -> getMessage()
+            ));
+        }
+    }
+
+    function gerNewProduct($param){
+        try {
+            global $pdo;
+
+            $sql = "SELECT p.*,max(pp.productpic_path) AS img FROM product p INNER JOIN product_pic pp ON p.id = pp.product_id WHERE p.status = 'Y' AND pp.cover = 'Y' group by p.id ORDER BY id DESC LIMIT 3";
+            
+            $new_product = DB::QueryAll($sql);
+            
+            responseJson(array(
+                'status' => true,
+                'data' => $new_product
+            ));
+        } catch (PDOException $e) {
             responseJson(array(
                 'status' => false,
                 'error' => $e -> getMessage()
