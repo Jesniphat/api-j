@@ -103,7 +103,7 @@
         try {
             global $pdo;
 
-            $sql = "SELECT p.*,max(pp.productpic_path) AS img FROM product p INNER JOIN product_pic pp ON p.id = pp.product_id WHERE p.status = 'Y' AND pp.cover = 'Y' group by p.id ORDER BY id DESC LIMIT 3";
+            $sql = "SELECT p.*,max(pp.productpic_path) AS img FROM product p INNER JOIN product_pic pp ON p.id = pp.product_id WHERE p.status = 'Y' AND pp.cover = 'Y' group by p.id ORDER BY id DESC";
             
             $new_product = DB::QueryAll($sql);
             
