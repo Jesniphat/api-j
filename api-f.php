@@ -36,6 +36,7 @@
     include_once './jwt/JWT.php';
     include_once './permission/permission.php';
     include_once 'base.php';
+    include_once './cart/cart.php';
 
     ///////////////////////////////////////////////////////////
     // start function
@@ -52,6 +53,9 @@
             break;
         case 'getNewProduct':
             gerNewProduct($param);
+            break;
+        case 'addtocart':
+            addToCart($param);
             break;
 	}
 
@@ -116,6 +120,25 @@
                 'status' => false,
                 'error' => $e -> getMessage()
             ));
+        }
+    }
+
+    function addToCart($param){
+        try {
+            $cart = new Cart();
+
+            $prod_qty = $param['qty'];
+            $prod_price = $param['qty'] * $param['price'];
+
+            if($cart->isCart()){
+                $cart_list = $cart->getCart();
+                if(in_array($param['id'], array_keys($cart_list['prod_list']))) {
+
+                }
+            }
+
+        } catch (Exception $e) {
+
         }
     }
 ?>
