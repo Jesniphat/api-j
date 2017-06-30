@@ -14,10 +14,12 @@
         	if ($cookieCart) {
                 $jwt = JWT::decode($_COOKIE[$this->cookieName], $this->lock, array('HS256'));
                 $cart_list = (array) $jwt;
+                $cart_list = json_decode(json_encode($cart_list), True);
             }
             else {
                 $cart_list = array("prod_list" => array(), "prod_qty" => 0, "prod_total" => 0);
             }
+            return $cart_list;
         }
 
         public function writeCart($product){

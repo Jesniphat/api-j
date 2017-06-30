@@ -57,6 +57,9 @@
         case 'addtocart':
             addToCart($param);
             break;
+        case 'getCart':
+            getCart();
+            break;
 	}
 
 	//////////////////////////////////////////////////////////
@@ -130,15 +133,56 @@
             $prod_qty = $param['qty'];
             $prod_price = $param['qty'] * $param['price'];
 
-            if($cart->isCart()){
-                $cart_list = $cart->getCart();
-                if(in_array($param['id'], array_keys($cart_list['prod_list']))) {
+            $cart_list = array();
 
-                }
+            $cart_list = $cart->getCart();
+            // print_r($cart_list);
+            if(in_array($param['id'], array_keys($cart_list['prod_list']))) {
+                $cart_list['prod_list'][$param['id']]['qty'] += $prod_qty;
+                $cart_list['prod_list'][$param['id']]['price'] += $prod_price;
+            }else{
+                // print_r($cart_list);
+                $cart_list['prod_list'][$param['id']] = array(
+                    'id' => $param['id'],
+                    'name' => $param['name'],
+                    'img' => $param['img'],
+                    'qty' => $param['qty'],
+                    'price' => $prod_price
+                );
             }
+            $cart_list['prod_qty'] += $prod_qty;
+            $cart_list['prod_total'] += $prod_price;
 
+            $cart->writeCart($cart_list);
+            // print_r($cart_list);
+            responseJson(array(
+                'status' => true,
+                'data' => array(
+                    'prod_qty' => $cart_list['prod_qty'],
+                    'prod_total' => $cart_list['prod_total']
+                )
+            ));
         } catch (Exception $e) {
+            responseJson(array(
+                'status' => false,
+                'error' => $e -> getMessage()
+            ));
+        }
+    }
 
+    function getCart(){
+        try{
+            $cart = new Cart();
+            $cart_list = $cart->getCart();
+            responseJson(array(
+                'status' => true,
+                'data' => $cart_list
+            ));
+        } catch (Exception $e) {
+            responseJson(array(
+                'status' => false,
+                'error' => $e -> getMessage()
+            ));
         }
     }
 ?>
