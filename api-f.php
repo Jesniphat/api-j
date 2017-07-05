@@ -33,10 +33,10 @@
     //  inclued setting
     ///////////////////////////////////////////////////////////
     include_once 'config.php';
-    include_once './jwt/JWT.php';
-    include_once './permission/permission.php';
+    include_once 'jwt/JWT.php';
+    include_once 'permission/permission.php';
     include_once 'base.php';
-    include_once './cart/cart.php';
+    include_once 'cart/cart.php';
 
     ///////////////////////////////////////////////////////////
     // start function
