@@ -7,7 +7,7 @@
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
   );
     try {
-      $pdo = new PDO('mysql:host=db;dbname=project-jphp;charset=utf8','root','rootp@ssw0rd',$opt);
+      $pdo = new PDO('mysql:host=mariadb;dbname=project-jphp;charset=utf8','root','rootp@ssw0rd',$opt);
     } catch (PDOException $e) {
       echo "ต่อฐานข้อมูบไม่ได้เหอะ ".$e;
     }
